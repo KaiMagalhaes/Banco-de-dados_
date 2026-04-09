@@ -1,9 +1,7 @@
-// 1. Importações (versão 10.8.0 — estável e correta)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// 2. Configuração do projeto Firebase
-const firebaseConfig = {
+const conf = {
     apiKey: "AIzaSyAzEUAvgalAp7CaWL789aFO8WP9heR6hXM",
     authDomain: "teste-firebase-f4e71.firebaseapp.com",
     projectId: "teste-firebase-f4e71",
@@ -12,48 +10,30 @@ const firebaseConfig = {
     appId: "1:914804237483:web:f019d2bf3f0f57b47703ee"
 };
 
-// 3. Inicialização dos Serviços
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(conf);
 const db = getFirestore(app);
 
-// 4. Função principal que carrega a lista de funcionários
-async function init() {
+async function carregarDados() {
     try {
-        console.log('A ligar ao Firestore...');
+        const snap = await getDocs(collection(db, "funcionarios"));
+        const lista = document.getElementById('lista-funcionarios');
+        lista.innerHTML = '';
 
-        const querySnapshot = await getDocs(collection(db, "funcionarios"));
-        const listaElement = document.getElementById('lista-funcionarios');
-
-        if (querySnapshot.empty) {
-            listaElement.innerHTML = '<li>Nenhum funcionário encontrado.</li>';
-            return;
-        }
-
-        listaElement.innerHTML = '';
-
-        querySnapshot.forEach((funcionario) => {
-            const dados = funcionario.data();
-            const contacto = dados.contacto || {};
-
-            const liElement = document.createElement('li');
-            liElement.innerHTML = `
-                <p><strong>${dados.nome}</strong> <small><i>(ID: ${funcionario.id})</i></small></p>
-                <p>📍 ${dados.morada || 'Sem morada'}</p>
-                <ul>
-                    <li>📧 ${contacto.email || '—'}</li>
-                    <li>📱 Pessoal: ${contacto.telemovelPessoal || '—'}</li>
-                    <li>📞 Fixo: ${contacto.telefoneFixo || '—'}</li>
-                    <li>💼 Trabalho: ${contacto.telemovelTrabalho || '—'}</li>
-                </ul>
+        snap.forEach((doc) => {
+            const f = doc.data();
+            const c = f.contacto || {};
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <p><strong>${f.nome}</strong></p>
+                <p style="font-size: 13px; color: #666;">${f.morada}</p>
+                <div style="font-size: 12px; margin-top: 5px;">
+                    <span>📧 ${c.email}</span> | <span>📱 ${c.telemovelPessoal}</span>
+                </div>
             `;
-            listaElement.appendChild(liElement);
+            lista.appendChild(li);
         });
-
-    } catch (error) {
-        console.error('Erro ao procurar dados dos funcionários:', error);
-        document.getElementById('lista-funcionarios').innerHTML =
-            '<li>Erro ao carregar dados. Verifica a consola.</li>';
+    } catch (err) {
+        console.log("Erro:", err);
     }
 }
-
-init();
+carregarDados();
