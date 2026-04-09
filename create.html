@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Funcionário - Firebase</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Registar Novo Funcionário</h1>
+        <form id="formFuncionario">
+            <input type="text" id="nome" placeholder="Nome Completo" required>
+            <input type="text" id="morada" placeholder="Morada" required>
+            <fieldset>
+                <legend>Contactos</legend>
+                <input type="email" id="email" placeholder="E-mail" required>
+                <input type="tel" id="telemovelPessoal" placeholder="Telemóvel Pessoal">
+                <input type="tel" id="telefoneFixo" placeholder="Telefone Fixo">
+                <input type="tel" id="telemovelTrabalho" placeholder="Telemóvel Trabalho">
+            </fieldset>
+            <button type="submit" id="btnGravar">Gravar na Cloud</button>
+            <a href="index.html">Voltar à lista</a>
+        </form>
+    </div>
+    <script type="module" src="app-create.js"></script>
+</body>
+</html>
