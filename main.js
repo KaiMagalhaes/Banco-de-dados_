@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const conf = {
   apiKey: "AIzaSyByK7sas0s_vJRVsogSKkzimOYH-oKEAhE",
@@ -13,6 +13,17 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
+async function apagarFuncionario(id) {
+  if (confirm("Tens a certeza que queres eliminar este funcionário?")) {
+    try {
+      await deleteDoc(doc(bd, "funcion.", id));
+      listaF();
+    } catch (err) {
+      console.log("Erro ao eliminar:", err);
+    }
+  }
+}
+
 async function listaF() {
   try {
     const snap = await getDocs(collection(bd, "funcion."));
@@ -20,21 +31,27 @@ async function listaF() {
     lista.innerHTML = '';
 
     if (snap.empty) {
-        lista.innerHTML = '<li>Nenhum funcionário encontrado na coleção "func."</li>';
+        lista.innerHTML = '<li>Nenhum funcionário encontrado.</li>';
         return;
     }
 
-    snap.forEach((doc) => {
-      const f = doc.data();
+    snap.forEach((elemento) => {
+      const f = elemento.data();
       const c = f.contacto || {};
+      const id = elemento.id;
       const li = document.createElement('li');
+      
       li.innerHTML = `
         <p><strong>${f.nome || 'Sem nome'}</strong></p>
         <p>${f.morada || 'Sem morada'}</p>
         <div style="font-size: 12px;">
           <span> ${c.email || '---'}</span> | <span> ${c.telemovelPessoal || '---'}</span>
-        </div>`;
+        </div>
+        <button id="btn-${id}" style="margin-top:10px; color:white; cursor:pointer;">Eliminar</button>`;
+      
       lista.appendChild(li);
+
+      document.getElementById(`btn-${id}`).addEventListener('click', () => apagarFuncionario(id));
     });
   } catch (err) {
     console.log("Erro:", err);
