@@ -15,9 +15,7 @@ const bd = getFirestore(app);
 
 async function guardaF(e) {
     e.preventDefault();
-    const btn = document.getElementById("btnGravar");
-    btn.disabled = true;
-
+    
     const novoF = {
         nome: document.getElementById("nome").value,
         morada: document.getElementById("morada").value,
@@ -34,8 +32,7 @@ async function guardaF(e) {
         alert("Novo funcionário guardado!");
         window.location.href = "index.html";
     } catch (err) {
-        console.error("Erro ao gravar:", err);
-        btn.disabled = false;
+        console.error(err);
     }
 }
 

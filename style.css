@@ -31,12 +31,6 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 24px;
-}
-
 input {
   width: 100%;
   padding: 12px;
@@ -51,7 +45,6 @@ input {
 input:focus {
   border-color: #0d6efd;
 }
-
 
 .secao-contato {
   padding: 15px;
@@ -68,19 +61,30 @@ input:focus {
   font-weight: bold;
 }
 
-button {
+button, .btn-novo {
   width: 100%;
-  padding: 12px;
-  background: #0d6efd;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  padding: 14px;
+  border-radius: 8px;
   font-weight: bold;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: block;
+  text-align: center;
 }
 
-button:hover {
-  background: #0b5ed7;
+button[type="submit"] {
+  background: linear-gradient(135deg, #198754, #146c43);
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-novo {
+  background: #0d6efd;
+  color: white;
+  margin-bottom: 20px;
 }
 
 #lista-funcionarios {
@@ -94,39 +98,29 @@ button:hover {
   padding: 15px;
   margin-bottom: 10px;
   border-radius: 8px;
-  color: #fff;
 }
 
-.contato-info {
-  font-size: 13px;
-  color: #aaa;
-  margin-top: 8px;
+.botoes-bloco {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit {
+  background: #979001;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-decoration: none;
 }
 
 .btn-excluir {
-  margin-top: 12px;
-  background-color: #bb2d3b;
+  background: #bb2d3b;
   color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn-excluir:hover {
-  background-color: #a52834;
-}
-
-.btn-novo {
-  display: block;
-  width: 100%;
-  text-align: center;
-  background: #198754;
-  color: white;
-  padding: 12px;
+  padding: 8px 20px;
   border-radius: 6px;
-  margin-bottom: 20px;
-  text-decoration: none;
+  font-size: 14px;
 }
 
 .voltar {
@@ -135,5 +129,4 @@ button:hover {
   margin-top: 15px;
   color: #aaa;
   text-decoration: none;
-  font-size: 14px;
 }

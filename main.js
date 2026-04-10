@@ -40,18 +40,22 @@ async function listaFuncion() {
       const contato = funcionario.contacto || {};
       const id = elemento.id;
       const lista = document.createElement('li');
-
+      
+      lista.className = 'item-lista';
+      
       lista.innerHTML = `
         <p><strong>${funcionario.nome || 'Sem nome'}</strong></p>
         <p>${funcionario.morada || 'Sem endereco'}</p>
         <div class="contato-info">
-          <span>Email: ${contato.email || '---'}</span> | <span>Celular: ${contato.telemovelPessoal || '---'}</span>
+          <span>Email: ${contato.email || '---'}</span> | <span>Cel: ${contato.telemovelPessoal || '---'}</span>
         </div>
-        <button id="btn-${id}" class="btn-excluir">Excluir</button>`;
+        <div class="botoes-bloco">
+          <a href="edit.html?id=${id}" class="btn-edit">Editar</a>
+          <button id="del-${id}" class="btn-excluir">Excluir</button>
+        </div>`;
 
       elementoLista.appendChild(lista);
-
-      document.getElementById(`btn-${id}`).addEventListener('click', () => apagarFuncionario(id));
+      document.getElementById(`del-${id}`).addEventListener('click', () => apagarFuncionario(id));
     });
   } catch (err) {
     console.log("Erro:", err);
