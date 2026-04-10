@@ -21,9 +21,9 @@ async function guardaF(e) {
         morada: document.getElementById("morada").value,
         contacto: {
             email: document.getElementById("email").value,
-            telemovelPessoal: document.getElementById("telemovelPessoal").value,
+            telefonePessoal: document.getElementById("telefonePessoal").value,
             telefoneFixo: document.getElementById("telefoneFixo").value,
-            telemovelTrabalho: document.getElementById("telemovelTrabalho").value
+            telefoneTrabalho: document.getElementById("telefoneTrabalho").value
         }
     };
 

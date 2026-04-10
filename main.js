@@ -14,7 +14,7 @@ const app = initializeApp(conf);
 const bd = getFirestore(app);
 
 async function apagar(id) {
-  if (confirm("Deseja eliminar?")) {
+  if (confirm("Quer eliminar?")) {
     await deleteDoc(doc(bd, "funcion.", id));
     lista();
   }
@@ -26,16 +26,16 @@ async function lista() {
   elemento.innerHTML = '';
 
   snap.forEach((d) => {
-    const f = d.data();
+    const funcionario = d.data();
     const id = d.id;
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <p><strong>${f.nome || 'Sem nome'}</strong></p>
+    const lista = document.createElement('li');
+    lista.innerHTML = `
+      <p><strong>${funcionario.nome || 'Sem nome'}</strong></p>
       <div class="botoes-bloco">
         <a href="edit.html?id=${id}" class="btn-edit">Editar</a>
         <button id="del-${id}" class="btn-excluir">Excluir</button>
       </div>`;
-    elemento.appendChild(li);
+    elemento.appendChild(lista);
     document.getElementById(`del-${id}`).addEventListener('click', () => apagar(id));
   });
 }

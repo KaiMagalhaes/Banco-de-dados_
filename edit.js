@@ -18,7 +18,7 @@ const idFunc = urlParams.get("id");
 
 async function carregar() {
   if (!idFunc) {
-    console.log("ID nao encontrado na URL");
+    console.log("id não encontrado");
     return;
   }
 
@@ -50,7 +50,7 @@ document.getElementById("formFuncionario").addEventListener("submit", async (e) 
     morada: document.getElementById("morada").value,
     contato: {
       email: document.getElementById("email").value,
-      telemovelPessoal: document.getElementById("telemovelPessoal").value
+      telefonePessoal: document.getElementById("telemovelPessoal").value
     }
   });
   window.location.href = "index.html";
