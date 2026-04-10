@@ -20,7 +20,6 @@ body {
   margin-bottom: 30px;
   font-family: "Playfair Display", serif;
   font-weight: 500;
-  border-bottom: 1px solid #333;
 }
 
 .container {
@@ -53,17 +52,20 @@ input:focus {
   border-color: #0d6efd;
 }
 
-fieldset {
+
+.secao-contato {
   padding: 15px;
   border: 1px solid #333;
   margin-bottom: 15px;
   border-radius: 8px;
+  background: #1a1a1a;
 }
 
-legend {
-  padding: 0 10px;
+.secao-contato p {
   font-size: 14px;
   color: #aaa;
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 
 button {
@@ -86,7 +88,7 @@ button:hover {
   padding: 0;
 }
 
-#lista-funcionarios lista {
+#lista-funcionarios li {
   background: #252525;
   border: 1px solid #333;
   padding: 15px;
