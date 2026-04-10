@@ -13,52 +13,30 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
-async function apagarFuncionario(id) {
-  if (confirm("Tem certeza que deseja excluir este funcionario?")) {
-    try {
-      await deleteDoc(doc(bd, "funcion.", id));
-      listaFuncion();
-    } catch (err) {
-      console.log("Erro ao excluir:", err);
-    }
+async function apagar(id) {
+  if (confirm("Deseja eliminar?")) {
+    await deleteDoc(doc(bd, "funcion.", id));
+    lista();
   }
 }
 
-async function listaFuncion() {
-  try {
-    const snap = await getDocs(collection(bd, "funcion."));
-    const elementoLista = document.getElementById('lista-funcionarios');
-    elementoLista.innerHTML = '';
+async function lista() {
+  const snap = await getDocs(collection(bd, "funcion."));
+  const elemento = document.getElementById('lista-funcionarios');
+  elemento.innerHTML = '';
 
-    if (snap.empty) {
-      elementoLista.innerHTML = '<li>Nenhum funcionario encontrado.</li>';
-      return;
-    }
-
-    snap.forEach((elemento) => {
-      const funcionario = elemento.data();
-      const contato = funcionario.contacto || {};
-      const id = elemento.id;
-      const lista = document.createElement('li');
-      
-      lista.className = 'item-lista';
-      
-      lista.innerHTML = `
-        <p><strong>${funcionario.nome || 'Sem nome'}</strong></p>
-        <p>${funcionario.morada || 'Sem endereco'}</p>
-        <div class="contato-info">
-          <span>Email: ${contato.email || '---'}</span> | <span>Cel: ${contato.telemovelPessoal || '---'}</span>
-        </div>
-        <div class="botoes-bloco">
-          <a href="edit.html?id=${id}" class="btn-edit">Editar</a>
-          <button id="del-${id}" class="btn-excluir">Excluir</button>
-        </div>`;
-
-      elementoLista.appendChild(lista);
-      document.getElementById(`del-${id}`).addEventListener('click', () => apagarFuncionario(id));
-    });
-  } catch (err) {
-    console.log("Erro:", err);
-  }
+  snap.forEach((d) => {
+    const f = d.data();
+    const id = d.id;
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <p><strong>${f.nome || 'Sem nome'}</strong></p>
+      <div class="botoes-bloco">
+        <a href="edit.html?id=${id}" class="btn-edit">Editar</a>
+        <button id="del-${id}" class="btn-excluir">Excluir</button>
+      </div>`;
+    elemento.appendChild(li);
+    document.getElementById(`del-${id}`).addEventListener('click', () => apagar(id));
+  });
 }
-listaFuncion();
+lista();
