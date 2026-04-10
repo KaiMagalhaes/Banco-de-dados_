@@ -13,42 +13,47 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
-const urlPrm = new URLSearchParams(window.location.search);
-const idFunc = urlPrm.get("id");
+const urlParams = new URLSearchParams(window.location.search);
+const idFunc = urlParams.get("id");
 
 async function carregar() {
-  if (!idFunc) return;
+  if (!idFunc) {
+    console.log("ID nao encontrado na URL");
+    return;
+  }
+
   try {
     const ref = doc(bd, "funcion.", idFunc);
     const snap = await getDoc(ref);
+
     if (snap.exists()) {
       const f = snap.data();
+      
       document.getElementById("nome").value = f.nome || "";
       document.getElementById("morada").value = f.morada || "";
-      document.getElementById("email").value = f.contacto?.email || "";
-      document.getElementById("telemovelPessoal").value = f.contacto?.telemovelPessoal || "";
+      
+      const c = f.contacto || {};
+      document.getElementById("email").value = c.email || "";
+      document.getElementById("telemovelPessoal").value = c.telemovelPessoal || "";
     }
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 }
 
-document.getElementById("formFuncionario")?.addEventListener("submit", async (e) => {
+document.getElementById("formFuncionario").addEventListener("submit", async (e) => {
   e.preventDefault();
-  try {
-    const ref = doc(bd, "funcion.", idFunc);
-    await updateDoc(ref, {
-      nome: document.getElementById("nome").value,
-      morada: document.getElementById("morada").value,
-      contacto: {
-        email: document.getElementById("email").value,
-        telemovelPessoal: document.getElementById("telemovelPessoal").value
-      }
-    });
-    window.location.href = "index.html";
-  } catch (err) {
-    console.error(err);
-  }
+  const ref = doc(bd, "funcion.", idFunc);
+  
+  await updateDoc(ref, {
+    nome: document.getElementById("nome").value,
+    morada: document.getElementById("morada").value,
+    contacto: {
+      email: document.getElementById("email").value,
+      telemovelPessoal: document.getElementById("telemovelPessoal").value
+    }
+  });
+  window.location.href = "index.html";
 });
 
 carregar();

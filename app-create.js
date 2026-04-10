@@ -29,7 +29,7 @@ async function guardaF(e) {
 
     try {
         await addDoc(collection(bd, "funcion."), novoF);
-        alert("Novo funcionário guardado!");
+        alert("Novo funcionário guardado");
         window.location.href = "index.html";
     } catch (err) {
         console.error(err);
