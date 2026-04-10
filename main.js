@@ -14,48 +14,47 @@ const app = initializeApp(conf);
 const bd = getFirestore(app);
 
 async function apagarFuncionario(id) {
-  if (confirm("Tens a certeza que queres eliminar este funcionário?")) {
+  if (confirm("Tem certeza que deseja excluir este funcionario?")) {
     try {
       await deleteDoc(doc(bd, "funcion.", id));
-      listaF();
+      listaFuncion();
     } catch (err) {
-      console.log("Erro ao eliminar:", err);
+      console.log("Erro ao excluir:", err);
     }
   }
 }
 
-async function listaF() {
+async function listaFuncion() {
   try {
     const snap = await getDocs(collection(bd, "funcion."));
-    const lista = document.getElementById('lista-funcionarios');
-    lista.innerHTML = '';
+    const elementoLista = document.getElementById('lista-funcionarios');
+    elementoLista.innerHTML = '';
 
     if (snap.empty) {
-        lista.innerHTML = '<li>Nenhum funcionário encontrado.</li>';
-        return;
+      elementoLista.innerHTML = '<li>Nenhum funcionario encontrado.</li>';
+      return;
     }
 
     snap.forEach((elemento) => {
-      const f = elemento.data();
-      const c = f.contacto || {};
+      const funcionario = elemento.data();
+      const contato = funcionario.contacto || {};
       const id = elemento.id;
-      const li = document.createElement('li');
-      
-      li.innerHTML = `
-        <p><strong>${f.nome || 'Sem nome'}</strong></p>
-        <p>${f.morada || 'Sem morada'}</p>
-        <div style="font-size: 12px;">
-          <span> ${c.email || '---'}</span> | <span> ${c.telemovelPessoal || '---'}</span>
+      const lista = document.createElement('li');
+
+      lista.innerHTML = `
+        <p><strong>${funcionario.nome || 'Sem nome'}</strong></p>
+        <p>${funcionario.morada || 'Sem endereco'}</p>
+        <div class="contato-info">
+          <span>Email: ${contato.email || '---'}</span> | <span>Celular: ${contato.telemovelPessoal || '---'}</span>
         </div>
-        <button id="btn-${id}" style="margin-top:10px; color:white; cursor:pointer;">Eliminar</button>`;
-      
-      lista.appendChild(li);
+        <button id="btn-${id}" class="btn-excluir">Excluir</button>`;
+
+      elementoLista.appendChild(lista);
 
       document.getElementById(`btn-${id}`).addEventListener('click', () => apagarFuncionario(id));
     });
   } catch (err) {
     console.log("Erro:", err);
-    document.getElementById('lista-funcionarios').innerHTML = '<li>Erro ao carregar dados.</li>';
   }
 }
-listaF();
+listaFuncion();

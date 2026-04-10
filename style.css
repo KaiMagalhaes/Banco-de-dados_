@@ -21,7 +21,6 @@ h1 {
   color: #333;
   text-align: center;
 }
-
 .btn-novo {
   display: block;
   width: 100%;
@@ -31,12 +30,11 @@ h1 {
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 20px;
+  text-decoration: none;
 }
 .btn-novo:hover {
   background: #218838;
 }
-
-
 #lista-funcionarios {
   list-style: none;
 }
@@ -47,7 +45,23 @@ h1 {
   margin-bottom: 10px;
   border-radius: 8px;
 }
-
+.contato-info {
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+}
+.btn-excluir {
+  margin-top: 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.btn-excluir:hover {
+  background-color: #c82333;
+}
 input {
   width: 100%;
   padding: 10px;
@@ -78,4 +92,9 @@ button:hover {
   margin-top: 15px;
   color: #666;
   font-size: 14px;
+}
+h1{
+  font-family: "Playfair Display", serif;
+  font-weight: 500;
+  font-style: normal;
 }
