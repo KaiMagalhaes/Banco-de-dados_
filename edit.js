@@ -48,7 +48,7 @@ document.getElementById("formFuncionario").addEventListener("submit", async (e) 
   await updateDoc(ref, {
     nome: document.getElementById("nome").value,
     morada: document.getElementById("morada").value,
-    contacto: {
+    contato: {
       email: document.getElementById("email").value,
       telemovelPessoal: document.getElementById("telemovelPessoal").value
     }
