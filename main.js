@@ -1,39 +1,44 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const conf = {
-    apiKey: "AIzaSyAzEUAvgalAp7CaWL789aFO8WP9heR6hXM",
-    authDomain: "teste-firebase-f4e71.firebaseapp.com",
-    projectId: "teste-firebase-f4e71",
-    storageBucket: "teste-firebase-f4e71.firebasestorage.app",
-    messagingSenderId: "914804237483",
-    appId: "1:914804237483:web:f019d2bf3f0f57b47703ee"
+  apiKey: "AIzaSyByK7sas0s_vJRVsogSKkzimOYH-oKEAhE",
+  authDomain: "batata-69.firebaseapp.com",
+  projectId: "batata-69",
+  storageBucket: "batata-69.firebasestorage.app",
+  messagingSenderId: "1041017537298",
+  appId: "1:1041017537298:web:b9d7ff1db5f983ef1569cb"
 };
 
 const app = initializeApp(conf);
-const db = getFirestore(app);
+const bd = getFirestore(app);
 
-async function carregarDados() {
-    try {
-        const snap = await getDocs(collection(db, "funcionarios"));
-        const lista = document.getElementById('lista-funcionarios');
-        lista.innerHTML = '';
+async function listaF() {
+  try {
+    const snap = await getDocs(collection(bd, "funcion."));
+    const lista = document.getElementById('lista-funcionarios');
+    lista.innerHTML = '';
 
-        snap.forEach((doc) => {
-            const f = doc.data();
-            const c = f.contacto || {};
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <p><strong>${f.nome}</strong></p>
-                <p style="font-size: 13px; color: #666;">${f.morada}</p>
-                <div style="font-size: 12px; margin-top: 5px;">
-                    <span>📧 ${c.email}</span> | <span>📱 ${c.telemovelPessoal}</span>
-                </div>
-            `;
-            lista.appendChild(li);
-        });
-    } catch (err) {
-        console.log("Erro:", err);
+    if (snap.empty) {
+        lista.innerHTML = '<li>Nenhum funcionário encontrado na coleção "func."</li>';
+        return;
     }
+
+    snap.forEach((doc) => {
+      const f = doc.data();
+      const c = f.contacto || {};
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <p><strong>${f.nome || 'Sem nome'}</strong></p>
+        <p>${f.morada || 'Sem morada'}</p>
+        <div style="font-size: 12px;">
+          <span> ${c.email || '---'}</span> | <span> ${c.telemovelPessoal || '---'}</span>
+        </div>`;
+      lista.appendChild(li);
+    });
+  } catch (err) {
+    console.log("Erro:", err);
+    document.getElementById('lista-funcionarios').innerHTML = '<li>Erro ao carregar dados.</li>';
+  }
 }
-carregarDados();
+listaF();
