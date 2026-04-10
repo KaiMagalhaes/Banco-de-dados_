@@ -1,17 +1,39 @@
-<div class="container">
-  <h1>Editar Funcionario</h1>
-  <form id="formEditar">
-    <input type="text" id="nome" placeholder="Nome Completo" required />
-    <input type="text" id="morada" placeholder="Endereco" required />
-    <div class="secao-contato">
-      <p>Dados de Contato</p>
-      <input type="email" id="email" placeholder="E-mail" required />
-      <input type="tel" id="telemovelPessoal" placeholder="Celular Pessoal" />
-      <input type="tel" id="telefoneFixo" placeholder="Telefone Fixo" />
-      <input type="tel" id="telemovelTrabalho" placeholder="Celular Trabalho" />
+<!doctype html>
+<html lang="pt" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Editar Funcionario - Firebase</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Editar Funcionario</h1>
+      <form id="formEditar">
+        <input type="text" id="nome" placeholder="Nome Completo" required />
+        <input type="text" id="morada" placeholder="Endereco" required />
+        <div class="secao-contato">
+          <p>Dados de Contato</p>
+          <input type="email" id="email" placeholder="E-mail" required />
+          <input
+            type="tel"
+            id="telemovelPessoal"
+            placeholder="Celular Pessoal"
+          />
+          <input type="tel" id="telefoneFixo" placeholder="Telefone Fixo" />
+          <input
+            type="tel"
+            id="telemovelTrabalho"
+            placeholder="Celular Trabalho"
+          />
+        </div>
+        <button type="submit" id="btnSalvar">Salvar Alteracoes</button>
+        <a href="index.html" class="voltar">Cancelar</a>
+      </form>
     </div>
-    <button type="submit" id="btnSalvar">Salvar Alteracoes</button>
-    <a href="index.html" class="voltar">Cancelar</a>
-  </form>
-</div>
-<script type="module" src="app-edit.js"></script>
+    <script type="module" src="app-edit.js"></script>
+  </body>
+</html>
