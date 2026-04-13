@@ -13,25 +13,22 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
-const urlParams = new URLSearchParams(window.location.search);
-const idFunc = urlParams.get("id");
+const urlPrm = new URLSearchParams(window.location.search);
+const idFunc = urlPrm.get("id");
 
 async function carregar() {
   if (!idFunc) return;
-
   try {
     const ref = doc(bd, "funcion.", idFunc);
     const snap = await getDoc(ref);
-
     if (snap.exists()) {
       const f = snap.data();
-      
       document.getElementById("nome").value = f.nome || "";
       document.getElementById("morada").value = f.morada || "";
       document.getElementById("cargo").value = f.cargo || "";
       
-      if (f.departamento) {
-        document.getElementById("departamento").value = f.departamento.id || "";
+      if (f.departamento?.id) {
+        document.getElementById("departamento").value = f.departamento.id;
       }
 
       const c = f.contacto || {};
@@ -45,10 +42,9 @@ async function carregar() {
   }
 }
 
-document.getElementById("formFuncionario").addEventListener("submit", async (e) => {
+document.getElementById("formFuncionario")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  
-  const selectDep = document.getElementById("departamento");
+  const sel = document.getElementById("departamento");
   const ref = doc(bd, "funcion.", idFunc);
   
   await updateDoc(ref, {
@@ -56,8 +52,8 @@ document.getElementById("formFuncionario").addEventListener("submit", async (e) 
     morada: document.getElementById("morada").value,
     cargo: document.getElementById("cargo").value,
     departamento: {
-      id: selectDep.value,
-      nome: selectDep.options[selectDep.selectedIndex].text
+      id: sel.value,
+      nome: sel.options[sel.selectedIndex].text
     },
     contacto: {
       email: document.getElementById("email").value,
@@ -67,7 +63,6 @@ document.getElementById("formFuncionario").addEventListener("submit", async (e) 
     },
     atualizadoEm: new Date()
   });
-  
   window.location.href = "index.html";
 });
 

@@ -7,13 +7,23 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="h1-box">Editar Funcionário</h1>
+        <h1 class="h1-box">Editar Funcionario</h1>
         <form id="formFuncionario">
             <input type="text" id="nome" placeholder="Nome" required />
             <input type="text" id="morada" placeholder="Endereco" required />
+            <input type="text" id="cargo" placeholder="Cargo" required />
+
+            <select id="departamento" required>
+                <option value="" disabled selected hidden>Selecione um Departamento</option>
+                <option value="dep1">Desenvolvimento</option>
+                <option value="dep2">Design & UX</option>
+            </select>
+
             <div class="secao-contato">
                 <input type="email" id="email" placeholder="E-mail" required />
-                <input type="tel" id="telefonePessoal" placeholder="Celular" />
+                <input type="tel" id="telefonePessoal" placeholder="Celular Pessoal" />
+                <input type="tel" id="telefoneFixo" placeholder="Telefone Fixo" />
+                <input type="tel" id="telefoneTrabalho" placeholder="Celular Trabalho" />
             </div>
             <button type="submit">Atualizar Dados</button>
             <a href="index.html" class="voltar">Cancelar</a>
