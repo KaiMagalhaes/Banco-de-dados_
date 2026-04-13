@@ -17,10 +17,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const idFunc = urlParams.get("id");
 
 async function carregar() {
-  if (!idFunc) {
-    console.log("id não encontrado");
-    return;
-  }
+  if (!idFunc) return;
 
   try {
     const ref = doc(bd, "funcion.", idFunc);
@@ -31,28 +28,46 @@ async function carregar() {
       
       document.getElementById("nome").value = f.nome || "";
       document.getElementById("morada").value = f.morada || "";
+      document.getElementById("cargo").value = f.cargo || "";
       
+      if (f.departamento) {
+        document.getElementById("departamento").value = f.departamento.id || "";
+      }
+
       const c = f.contacto || {};
       document.getElementById("email").value = c.email || "";
-      document.getElementById("telemovelPessoal").value = c.telemovelPessoal || "";
+      document.getElementById("telefonePessoal").value = c.telefonePessoal || "";
+      document.getElementById("telefoneFixo").value = c.telefoneFixo || "";
+      document.getElementById("telefoneTrabalho").value = c.telefoneTrabalho || "";
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
 document.getElementById("formFuncionario").addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  const selectDep = document.getElementById("departamento");
   const ref = doc(bd, "funcion.", idFunc);
   
   await updateDoc(ref, {
     nome: document.getElementById("nome").value,
     morada: document.getElementById("morada").value,
-    contato: {
+    cargo: document.getElementById("cargo").value,
+    departamento: {
+      id: selectDep.value,
+      nome: selectDep.options[selectDep.selectedIndex].text
+    },
+    contacto: {
       email: document.getElementById("email").value,
-      telefonePessoal: document.getElementById("telemovelPessoal").value
-    }
+      telefonePessoal: document.getElementById("telefonePessoal").value,
+      telefoneFixo: document.getElementById("telefoneFixo").value,
+      telefoneTrabalho: document.getElementById("telefoneTrabalho").value
+    },
+    atualizadoEm: new Date()
   });
+  
   window.location.href = "index.html";
 });
 
