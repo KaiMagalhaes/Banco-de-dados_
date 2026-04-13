@@ -13,10 +13,10 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
-async function guardaF(e) {
+async function guardaFunc(e) {
     e.preventDefault();
 
-    // Captura do select para obter o texto visível e o valor técnico
+   
     const selectDep = document.getElementById("departamento");
     const idDep = selectDep.value;
     const nomeDep = selectDep.options[selectDep.selectedIndex].text;
@@ -24,10 +24,10 @@ async function guardaF(e) {
     const novoF = {
         nome: document.getElementById("nome").value,
         morada: document.getElementById("morada").value,
-        cargo: document.getElementById("cargo").value, // Referência simples (string)
+        cargo: document.getElementById("cargo").value, 
         departamento: {
-            id: idDep,    // Referência para consultas complexas
-            nome: nomeDep // Dados embutidos para performance no carregamento da lista
+            id: idDep,    
+            nome: nomeDep
         },
         contacto: {
             email: document.getElementById("email").value,
@@ -39,12 +39,12 @@ async function guardaF(e) {
     };
 
     try {
-        await addDoc(collection(bd, "funcion."), novoF);
-        alert("Funcionário registado com sucesso no departamento " + nomeDep);
+        await addDoc(collection(bd, "funcion."), novoFunc);
+        alert("Funcionário registrado");
         window.location.href = "index.html";
     } catch (err) {
         console.error(err);
     }
 }
 
-document.getElementById("formFuncionario").addEventListener("submit", guardaF);
+document.getElementById("formFuncionario").addEventListener("submit", guardaFunc);
