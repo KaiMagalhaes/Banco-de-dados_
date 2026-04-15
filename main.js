@@ -38,7 +38,7 @@ function criarLayoutItem(idDocumento, dadosFuncionario) {
 }
 
 async function removerFuncionario(idDocumento) {
-    if (confirm("Tens a certeza que queres eliminar?")) {
+    if (confirm("Deseja eliminar este registo?")) {
         try {
             await deleteDoc(doc(bancoDados, "funcion.", idDocumento));
         } catch (erro) {
@@ -50,7 +50,9 @@ async function removerFuncionario(idDocumento) {
 function ligarBotoesExcluir(listaSnap) {
     listaSnap.forEach((documento) => {
         const botao = document.getElementById(`del-${documento.id}`);
-        if (botao) botao.onclick = () => removerFuncionario(documento.id);
+        if (botao) {
+            botao.onclick = () => removerFuncionario(documento.id);
+        }
     });
 }
 
@@ -60,43 +62,44 @@ function carregarLista(textoBusca = "", modoTempoReal = false, direcaoOrdem = "d
         monitoramentoDados = null;
     }
 
-    let consultaFinal;
     const colecaoFuncionarios = collection(bancoDados, "funcion.");
-    const termoPesquisa = textoBusca.trim();
-    let listaFiltros = [];
+    let filtrosFirebase = [];
 
     if (filtroDepto) {
-        listaFiltros.push(where("departamento.nome", "==", filtroDepto));
+        filtrosFirebase.push(where("departamento.nome", "==", filtroDepto));
     }
 
-    if (termoPesquisa) {
-        listaFiltros.push(where("nome", ">=", termoPesquisa));
-        listaFiltros.push(where("nome", "<=", termoPesquisa + "\uf8ff"));
-        consultaFinal = query(colecaoFuncionarios, ...listaFiltros, orderBy("nome"));
-    } else {
-        consultaFinal = query(colecaoFuncionarios, ...listaFiltros, orderBy("criadoEm", direcaoOrdem));
-    }
+    const consultaBase = query(
+        colecaoFuncionarios, 
+        ...filtrosFirebase, 
+        orderBy("criadoEm", direcaoOrdem)
+    );
 
-    const desenharNaTela = (resultado) => {
+    const processarResultados = (resultado) => {
         const containerLista = document.getElementById('lista-funcionarios');
         if (!containerLista) return;
+        
         containerLista.innerHTML = '';
+        const termoLimpo = textoBusca.toLowerCase().trim();
+
         resultado.forEach((documento) => {
-            const itemLista = document.createElement('li');
-            itemLista.innerHTML = criarLayoutItem(documento.id, documento.data());
-            containerLista.appendChild(itemLista);
+            const dados = documento.data();
+            const nomeTexto = (dados.nome || "").toLowerCase();
+
+            if (nomeTexto.includes(termoLimpo)) {
+                const itemLista = document.createElement('li');
+                itemLista.innerHTML = criarLayoutItem(documento.id, dados);
+                containerLista.appendChild(itemLista);
+            }
         });
+        
         ligarBotoesExcluir(resultado);
     };
 
-    const tratarErro = (erro) => {
-        console.error("Erro na consulta:", erro);
-    };
-
     if (modoTempoReal) {
-        monitoramentoDados = onSnapshot(consultaFinal, desenharNaTela, tratarErro);
+        monitoramentoDados = onSnapshot(consultaBase, processarResultados, (erro) => console.error(erro));
     } else {
-        getDocs(consultaFinal).then(desenharNaTela).catch(tratarErro);
+        getDocs(consultaBase).then(processarResultados).catch((erro) => console.error(erro));
     }
 }
 
@@ -107,10 +110,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const botaoTempoReal = document.getElementById("btn-tempo-real");
 
     const atualizarTudo = () => {
-        const termo = campoBusca ? campoBusca.value : "";
+        const texto = campoBusca ? campoBusca.value : "";
         const ordem = selectOrdem ? selectOrdem.value : "desc";
         const departamento = selectDepto ? selectDepto.value : "";
-        carregarLista(termo, monitoramentoDados !== null, ordem, departamento);
+        const ativo = monitoramentoDados !== null;
+        carregarLista(texto, ativo, ordem, departamento);
     };
 
     carregarLista();
@@ -121,15 +125,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (botaoTempoReal) {
         botaoTempoReal.onclick = () => {
-            const termo = campoBusca ? campoBusca.value : "";
+            const texto = campoBusca ? campoBusca.value : "";
             const ordem = selectOrdem ? selectOrdem.value : "desc";
             const departamento = selectDepto ? selectDepto.value : "";
+
             if (monitoramentoDados) {
                 botaoTempoReal.textContent = "Ativar Tempo Real";
-                carregarLista(termo, false, ordem, departamento);
+                carregarLista(texto, false, ordem, departamento);
             } else {
                 botaoTempoReal.textContent = "Parar Tempo Real";
-                carregarLista(termo, true, ordem, departamento);
+                carregarLista(texto, true, ordem, departamento);
             }
         };
     }
