@@ -2,14 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/fireba
 import { 
     getFirestore, 
     collection, 
-    getDocs, 
     doc, 
     deleteDoc, 
     query, 
     where, 
     orderBy, 
-    limit, 
-    onSnapshot 
+    onSnapshot,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const conf = {
@@ -24,19 +23,11 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
-function renderItem(id, funcionario) {
-    const ctt = funcionario.contacto || {};
-    const dep = funcionario.departamento?.nome || "—";
-    const cargo = funcionario.cargo || "—";
-    
+function renderItem(id, f) {
+    const c = f.contacto || f.contato || {};
     return `
-        <p><strong>${funcionario.nome || 'Sem nome'}</strong> <span class="badge-dep">${dep}</span></p>
-        <p class="cargo">${cargo}</p>
-        <p>${funcionario.morada || ""}</p>
-        <div class="contactos">
-            <span> ${ctt.email || "—"}</span> |
-            <span> ${ctt.telefonePessoal || "—"}</span>
-        </div>
+        <p><strong>${f.nome || 'Sem nome'}</strong></p>
+        <p>${c.email || "—"}</p>
         <div class="botoes-bloco">
             <a href="edit.html?id=${id}" class="btn-edit">Editar</a>
             <button id="del-${id}" class="btn-excluir">Excluir</button>
@@ -46,85 +37,50 @@ function renderItem(id, funcionario) {
 async function apagar(id) {
     if (confirm("Quer eliminar?")) {
         await deleteDoc(doc(bd, "funcion.", id));
-        lerDados();
     }
 }
 
-function vincularBotoes(snapshot) {
-    snapshot.forEach((d) => {
+function vincular(snap) {
+    snap.forEach((d) => {
         const btn = document.getElementById(`del-${d.id}`);
-        if (btn) {
-            btn.addEventListener('click', () => apagar(d.id));
-        }
+        if (btn) btn.onclick = () => apagar(d.id);
     });
 }
 
-async function lerDados() {
-    try {
-        const q = query(
-            collection(bd, "funcion."),
-            orderBy("nome"),
-            limit(20)
+function carregarLista(termo = "") {
+    let q;
+    const ref = collection(bd, "funcion.");
+
+    if (termo) {
+        q = query(
+            ref, 
+            where("nome", ">=", termo), 
+            where("nome", "<=", termo + "\uf8ff"),
+            orderBy("nome")
         );
-        const snapshot = await getDocs(q);
-        const elemento = document.getElementById("lista-funcionarios");
-        elemento.innerHTML = "";
+    } else {
+        q = query(ref, orderBy("nome"));
+    }
 
-        if (snapshot.empty) {
-            elemento.innerHTML = "<li>Sem funcionários registados.</li>";
-            return;
-        }
-
-        snapshot.forEach((d) => {
-            const li = document.createElement("li");
+    onSnapshot(q, (snap) => {
+        const elemento = document.getElementById('lista-funcionarios');
+        elemento.innerHTML = '';
+        snap.forEach((d) => {
+            const li = document.createElement('li');
             li.innerHTML = renderItem(d.id, d.data());
             elemento.appendChild(li);
         });
-        vincularBotoes(snapshot);
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-async function pesquisarPorNome(prefixo) {
-    if (!prefixo.trim()) {
-        lerDados(); 
-        return;
-    }
-
-    const inicio = prefixo;
-    const fim = prefixo + "\uf8ff";
-
-    try {
-        const q = query(
-            collection(bd, "funcion."),
-            where("nome", ">=", inicio),
-            where("nome", "<", fim),
-            orderBy("nome"),
-            limit(20)
-        );
-        const snapshot = await getDocs(q);
-        const elemento = document.getElementById("lista-funcionarios");
-        elemento.innerHTML = "";
-
-        snapshot.forEach((d) => {
-            const li = document.createElement("li");
-            li.innerHTML = renderItem(d.id, d.data());
-            elemento.appendChild(li);
-        });
-        vincularBotoes(snapshot);
-    } catch (e) {
-        console.error(e);
-    }
+        vincular(snap);
+    });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    lerDados();
-
-    const inputPesquisa = document.getElementById("searchBar");
-    if (inputPesquisa) {
-        inputPesquisa.addEventListener("input", (e) => {
-            pesquisarPorNome(e.target.value);
+    carregarLista();
+    
+    const barra = document.getElementById("searchBar");
+    if (barra) {
+        barra.addEventListener("input", (e) => {
+            carregarLista(e.target.value);
         });
     }
 });
