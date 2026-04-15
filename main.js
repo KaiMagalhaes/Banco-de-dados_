@@ -23,6 +23,8 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
+let stop = null;
+
 function renderItem(id, f) {
     const c = f.contacto || f.contato || {};
     return `
@@ -35,7 +37,7 @@ function renderItem(id, f) {
 }
 
 async function apagar(id) {
-    if (confirm("Quer eliminar?")) {
+    if (confirm("Quer excluir?")) {
         await deleteDoc(doc(bd, "funcion.", id));
     }
 }
@@ -47,23 +49,25 @@ function vincular(snap) {
     });
 }
 
-function carregarLista(termo = "") {
+function carregarLista(termo = "", real = false) {
+    if (stop) {
+        console.log("parando tempo real");
+        stop();
+        stop = null;
+    }
+
     let q;
     const ref = collection(bd, "funcion.");
 
     if (termo) {
-        q = query(
-            ref, 
-            where("nome", ">=", termo), 
-            where("nome", "<=", termo + "\uf8ff"),
-            orderBy("nome")
-        );
+        q = query(ref, where("nome", ">=", termo), where("nome", "<=", termo + "\uf8ff"), orderBy("nome"));
     } else {
         q = query(ref, orderBy("nome"));
     }
 
-    onSnapshot(q, (snap) => {
+    const desenhar = (snap) => {
         const elemento = document.getElementById('lista-funcionarios');
+        if (!elemento) return console.error("Lista não encontrada");
         elemento.innerHTML = '';
         snap.forEach((d) => {
             const li = document.createElement('li');
@@ -71,7 +75,15 @@ function carregarLista(termo = "") {
             elemento.appendChild(li);
         });
         vincular(snap);
-    });
+    };
+
+    if (real) {
+        console.log("Modo tempo real ligado");
+        stop = onSnapshot(q, desenhar, (err) => console.error("Erro no TR:", err));
+    } else {
+        console.log("Modo tempo real desligado");
+        getDocs(q).then(desenhar).catch(err => console.error("Erro getDocs:", err));
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -80,7 +92,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const barra = document.getElementById("searchBar");
     if (barra) {
         barra.addEventListener("input", (e) => {
-            carregarLista(e.target.value);
+            carregarLista(e.target.value, stop !== null);
         });
     }
+
+    const btn = document.getElementById("btn-tempo-real");
+    if (btn) {
+        btn.onclick = () => {
+            const txt = barra ? barra.value : "";
+            if (stop) {
+                carregarLista(txt, false);
+                btn.textContent = "Ativar tempo real";
+            } else {
+                carregarLista(txt, true);
+                btn.textContent = "Parar tempo real";
+            }
+        };
+    } 
 });
