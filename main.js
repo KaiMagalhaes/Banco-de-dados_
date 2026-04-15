@@ -11,7 +11,7 @@ import {
     getDocs
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-const conf = {
+const firebaseConfig = {
   apiKey: "AIzaSyByK7sas0s_vJRVsogSKkzimOYH-oKEAhE",
   authDomain: "batata-69.firebaseapp.com",
   projectId: "batata-69",
@@ -20,113 +20,116 @@ const conf = {
   appId: "1:1041017537298:web:b9d7ff1db5f983ef1569cb"
 };
 
-const app = initializeApp(conf);
-const bd = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const bancoDados = getFirestore(app);
 
-let stop = null;
+let monitoramentoDados = null;
 
-function renderItem(id, f) {
-    const c = f.contacto || f.contato || {};
+function criarLayoutItem(idDocumento, dadosFuncionario) {
+    const contacto = dadosFuncionario.contacto || dadosFuncionario.contato || {};
     return `
-        <p><strong>${f.nome || 'Sem nome'}</strong></p>
-        <p>${c.email || "—"}</p>
-        <p><small>Depto: ${f.departamento?.nome || "N/A"}</small></p>
+        <p><strong>${dadosFuncionario.nome || 'Sem nome'}</strong></p>
+        <p>${contacto.email || "—"}</p>
+        <p><small>Depto: ${dadosFuncionario.departamento?.nome || "N/A"}</small></p>
         <div class="botoes-bloco">
-            <a href="edit.html?id=${id}" class="btn-edit">Editar</a>
-            <button id="del-${id}" class="btn-excluir">Excluir</button>
+            <a href="edit.html?id=${idDocumento}" class="btn-edit">Editar</a>
+            <button id="del-${idDocumento}" class="btn-excluir">Excluir</button>
         </div>`;
 }
 
-async function apagar(id) {
-    if (confirm("Quer eliminar?")) {
+async function removerFuncionario(idDocumento) {
+    if (confirm("Tens a certeza que queres eliminar?")) {
         try {
-            await deleteDoc(doc(bd, "funcion.", id));
-        } catch (err) {
-            console.error(err);
+            await deleteDoc(doc(bancoDados, "funcion.", idDocumento));
+        } catch (erro) {
+            console.error("Erro ao apagar:", erro);
         }
     }
 }
 
-function vincular(snap) {
-    snap.forEach((d) => {
-        const btn = document.getElementById(`del-${d.id}`);
-        if (btn) btn.onclick = () => apagar(d.id);
+function ligarBotoesExcluir(listaSnap) {
+    listaSnap.forEach((documento) => {
+        const botao = document.getElementById(`del-${documento.id}`);
+        if (botao) botao.onclick = () => removerFuncionario(documento.id);
     });
 }
 
-function carregarLista(termo = "", real = false, ordem = "desc", depto = "") {
-    if (stop) {
-        stop();
-        stop = null;
+function carregarLista(textoBusca = "", modoTempoReal = false, direcaoOrdem = "desc", filtroDepto = "") {
+    if (monitoramentoDados) {
+        monitoramentoDados();
+        monitoramentoDados = null;
     }
 
-    let q;
-    const ref = collection(bd, "funcion.");
-    const f = termo.trim();
-    let cond = [];
+    let consultaFinal;
+    const colecaoFuncionarios = collection(bancoDados, "funcion.");
+    const termoPesquisa = textoBusca.trim();
+    let listaFiltros = [];
 
-    if (depto) {
-        cond.push(where("departamento.nome", "==", depto));
+    if (filtroDepto) {
+        listaFiltros.push(where("departamento.nome", "==", filtroDepto));
     }
 
-    if (f) {
-        cond.push(where("nome", ">=", f));
-        cond.push(where("nome", "<=", f + "\uf8ff"));
-        q = query(ref, ...cond, orderBy("nome"));
+    if (termoPesquisa) {
+        listaFiltros.push(where("nome", ">=", termoPesquisa));
+        listaFiltros.push(where("nome", "<=", termoPesquisa + "\uf8ff"));
+        consultaFinal = query(colecaoFuncionarios, ...listaFiltros, orderBy("nome"));
     } else {
-        q = query(ref, ...cond, orderBy("criadoEm", ordem));
+        consultaFinal = query(colecaoFuncionarios, ...listaFiltros, orderBy("criadoEm", direcaoOrdem));
     }
 
-    const desenhar = (snap) => {
-        const elemento = document.getElementById('lista-funcionarios');
-        if (!elemento) return;
-        elemento.innerHTML = '';
-        snap.forEach((d) => {
-            const li = document.createElement('li');
-            li.innerHTML = renderItem(d.id, d.data());
-            elemento.appendChild(li);
+    const desenharNaTela = (resultado) => {
+        const containerLista = document.getElementById('lista-funcionarios');
+        if (!containerLista) return;
+        containerLista.innerHTML = '';
+        resultado.forEach((documento) => {
+            const itemLista = document.createElement('li');
+            itemLista.innerHTML = criarLayoutItem(documento.id, documento.data());
+            containerLista.appendChild(itemLista);
         });
-        vincular(snap);
+        ligarBotoesExcluir(resultado);
     };
 
-    const falha = (err) => {
-        console.error("Erro na busca:", err);
+    const tratarErro = (erro) => {
+        console.error("Erro na consulta:", erro);
     };
 
-    if (real) {
-        stop = onSnapshot(q, desenhar, falha);
+    if (modoTempoReal) {
+        monitoramentoDados = onSnapshot(consultaFinal, desenharNaTela, tratarErro);
     } else {
-        getDocs(q).then(desenhar).catch(falha);
+        getDocs(consultaFinal).then(desenharNaTela).catch(tratarErro);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const barra = document.getElementById("searchBar");
-    const selOrdem = document.getElementById("ordenarTempo");
-    const selDepto = document.getElementById("filtroDepartamento");
-    const btn = document.getElementById("btn-tempo-real");
+    const campoBusca = document.getElementById("searchBar");
+    const selectOrdem = document.getElementById("ordenarTempo");
+    const selectDepto = document.getElementById("filtroDepartamento");
+    const botaoTempoReal = document.getElementById("btn-tempo-real");
 
-    const atualizar = () => {
-        const t = barra ? barra.value : "";
-        const o = selOrdem ? selOrdem.value : "desc";
-        const d = selDepto ? selDepto.value : "";
-        carregarLista(t, stop !== null, o, d);
+    const atualizarTudo = () => {
+        const termo = campoBusca ? campoBusca.value : "";
+        const ordem = selectOrdem ? selectOrdem.value : "desc";
+        const departamento = selectDepto ? selectDepto.value : "";
+        carregarLista(termo, monitoramentoDados !== null, ordem, departamento);
     };
 
     carregarLista();
 
-    if (barra) barra.addEventListener("input", atualizar);
-    if (selOrdem) selOrdem.addEventListener("change", atualizar);
-    if (selDepto) selDepto.addEventListener("change", atualizar);
+    if (campoBusca) campoBusca.addEventListener("input", atualizarTudo);
+    if (selectOrdem) selectOrdem.addEventListener("change", atualizarTudo);
+    if (selectDepto) selectDepto.addEventListener("change", atualizarTudo);
 
-    if (btn) {
-        btn.onclick = () => {
-            if (stop) {
-                btn.textContent = "Ativar Tempo Real";
-                carregarLista(barra.value, false, selOrdem.value, selDepto.value);
+    if (botaoTempoReal) {
+        botaoTempoReal.onclick = () => {
+            const termo = campoBusca ? campoBusca.value : "";
+            const ordem = selectOrdem ? selectOrdem.value : "desc";
+            const departamento = selectDepto ? selectDepto.value : "";
+            if (monitoramentoDados) {
+                botaoTempoReal.textContent = "Ativar Tempo Real";
+                carregarLista(termo, false, ordem, departamento);
             } else {
-                btn.textContent = "Parar Tempo Real";
-                carregarLista(barra.value, true, selOrdem.value, selDepto.value);
+                botaoTempoReal.textContent = "Parar Tempo Real";
+                carregarLista(termo, true, ordem, departamento);
             }
         };
     }
