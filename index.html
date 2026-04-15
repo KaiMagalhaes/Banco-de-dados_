@@ -8,12 +8,6 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -24,35 +18,46 @@
     <div class="container">
       <div class="header-acoes">
         <h1 class="text-center">Lista de Funcionários</h1>
-        <button class="btn btn-success" id="btn-tempo-real">Ativar Tempo Real</button>
-        <div class="busca-bloco">
+        <button class="btn btn-success" id="btn-tempo-real">
+          Ativar Tempo Real
+        </button>
+
+        <div class="busca-bloco mt-3">
           <input
             type="text"
             id="searchBar"
             placeholder="Pesquisar por nome"
+            class="form-control"
           />
         </div>
-        <div>
+
+        <div class="filtros-bloco mt-3 d-flex gap-2">
           <div>
-            <label for="ordenadoPorTempo">Ordenar por tempo</label>
-            <select name="ordenarPorTempo" id="ordenarPortTempo">
-              <option value="">Ordenar por...</option>
-              <option value="asc">Mais recente primeiro</option>
-              <option value="desc">Mais antigo primeiro</option>
+            <label>Ordenar:</label>
+            <select id="ordenarTempo" class="form-select">
+              <option value="desc">Mais recente</option>
+              <option value="asc">Mais antigo</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Departamento:</label>
+            <select id="filtroDepartamento" class="form-select">
+              <option value="">Todos</option>
+              <option value="Desenvolvimento">Desenvolvimento</option>
+              <option value="UI/UX">UI/UX</option>
             </select>
           </div>
         </div>
-        <ul id="lista-funcionarios"></ul>
+
+        <ul id="lista-funcionarios" class="lista-custom mt-4">
+          <li><span>A carregar dados...</span></li>
+        </ul>
+
         <a href="create.html" class="btn-novo">Novo Funcionário</a>
       </div>
-
-
-      <ul id="lista-funcionarios" class="lista-custom">
-        <li><span>A carregar dados...</span></li>
-      </ul>
     </div>
 
     <script type="module" src="main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

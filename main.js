@@ -30,6 +30,7 @@ function renderItem(id, f) {
     return `
         <p><strong>${f.nome || 'Sem nome'}</strong></p>
         <p>${c.email || "—"}</p>
+        <p><small>Depto: ${f.departamento?.nome || "N/A"}</small></p>
         <div class="botoes-bloco">
             <a href="edit.html?id=${id}" class="btn-edit">Editar</a>
             <button id="del-${id}" class="btn-excluir">Excluir</button>
@@ -53,7 +54,7 @@ function vincular(snap) {
     });
 }
 
-function carregarLista(termo = "", real = false, ordem = "desc") {
+function carregarLista(termo = "", real = false, ordem = "desc", depto = "") {
     if (stop) {
         stop();
         stop = null;
@@ -62,11 +63,18 @@ function carregarLista(termo = "", real = false, ordem = "desc") {
     let q;
     const ref = collection(bd, "funcion.");
     const f = termo.trim();
+    let cond = [];
+
+    if (depto) {
+        cond.push(where("departamento.nome", "==", depto));
+    }
 
     if (f) {
-        q = query(ref, where("nome", ">=", f), where("nome", "<=", f + "\uf8ff"), orderBy("nome"));
+        cond.push(where("nome", ">=", f));
+        cond.push(where("nome", "<=", f + "\uf8ff"));
+        q = query(ref, ...cond, orderBy("nome"));
     } else {
-        q = query(ref, orderBy("criadoEm", ordem));
+        q = query(ref, ...cond, orderBy("criadoEm", ordem));
     }
 
     const desenhar = (snap) => {
@@ -81,39 +89,44 @@ function carregarLista(termo = "", real = false, ordem = "desc") {
         vincular(snap);
     };
 
+    const falha = (err) => {
+        console.error("Erro na busca:", err);
+    };
+
     if (real) {
-        stop = onSnapshot(q, desenhar, (err) => console.error(err));
+        stop = onSnapshot(q, desenhar, falha);
     } else {
-        getDocs(q).then(desenhar).catch(err => console.error(err));
+        getDocs(q).then(desenhar).catch(falha);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const barra = document.getElementById("searchBar");
-    const seletor = document.getElementById("ordenarTempo"); 
+    const selOrdem = document.getElementById("ordenarTempo");
+    const selDepto = document.getElementById("filtroDepartamento");
+    const btn = document.getElementById("btn-tempo-real");
 
     const atualizar = () => {
         const t = barra ? barra.value : "";
-        const o = seletor && seletor.value === "antigo" ? "asc" : "desc";
-        carregarLista(t, stop !== null, o);
+        const o = selOrdem ? selOrdem.value : "desc";
+        const d = selDepto ? selDepto.value : "";
+        carregarLista(t, stop !== null, o, d);
     };
 
     carregarLista();
 
     if (barra) barra.addEventListener("input", atualizar);
-    if (seletor) seletor.addEventListener("change", atualizar);
+    if (selOrdem) selOrdem.addEventListener("change", atualizar);
+    if (selDepto) selDepto.addEventListener("change", atualizar);
 
-    const btn = document.getElementById("btn-tempo-real");
     if (btn) {
         btn.onclick = () => {
             if (stop) {
-                atualizar(); 
-                btn.textContent = "Ativar tempo real";
+                btn.textContent = "Ativar Tempo Real";
+                carregarLista(barra.value, false, selOrdem.value, selDepto.value);
             } else {
-                const t = barra ? barra.value : "";
-                const o = seletor && seletor.value === "antigo" ? "asc" : "desc";
-                carregarLista(t, true, o);
-                btn.textContent = "Parar tempo real";
+                btn.textContent = "Parar Tempo Real";
+                carregarLista(barra.value, true, selOrdem.value, selDepto.value);
             }
         };
     }
