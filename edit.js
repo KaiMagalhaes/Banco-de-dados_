@@ -13,56 +13,61 @@ const conf = {
 const app = initializeApp(conf);
 const bd = getFirestore(app);
 
-const urlPrm = new URLSearchParams(window.location.search);
-const idFunc = urlPrm.get("id");
+const urlParams = new URLSearchParams(window.location.search);
+const idFunc = urlParams.get("id");
 
 async function carregar() {
   if (!idFunc) return;
+
   try {
-    const ref = doc(bd, "funcionarios", idFunc);
+    const ref = doc(bd, "funcion.", idFunc);
     const snap = await getDoc(ref);
+
     if (snap.exists()) {
       const f = snap.data();
+      
       document.getElementById("nome").value = f.nome || "";
       document.getElementById("morada").value = f.morada || "";
       document.getElementById("cargo").value = f.cargo || "";
       
-      if (f.departamento?.id) {
+      if (f.departamento && f.departamento.id) {
         document.getElementById("departamento").value = f.departamento.id;
       }
 
       const c = f.contacto || {};
       document.getElementById("email").value = c.email || "";
-      document.getElementById("telefonePessoal").value = c.tmvP || "";
-      document.getElementById("telefoneFixo").value = c.tlfF || "";
-      document.getElementById("telefoneTrabalho").value = c.tmvT || "";
+      document.getElementById("telefonePessoal").value = c.telefonePessoal || "";
+      document.getElementById("telefoneFixo").value = c.telefoneFixo || "";
+      document.getElementById("telefoneTrabalho").value = c.telefoneTrabalho || "";
     }
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 }
 
-document.getElementById("formFuncionario")?.addEventListener("submit", async (e) => {
+document.getElementById("formFuncionario").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const sel = document.getElementById("departamento");
-  const ref = doc(bd, "funcionarios", idFunc);
+  
+  const selectDep = document.getElementById("departamento");
+  const ref = doc(bd, "funcion.", idFunc);
   
   await updateDoc(ref, {
     nome: document.getElementById("nome").value,
     morada: document.getElementById("morada").value,
     cargo: document.getElementById("cargo").value,
     departamento: {
-      id: sel.value,
-      nome: sel.options[sel.selectedIndex].text
+      id: selectDep.value,
+      nome: selectDep.options[selectDep.selectedIndex].text
     },
     contacto: {
       email: document.getElementById("email").value,
-      tmvP: document.getElementById("telefonePessoal").value,
-      tlfF: document.getElementById("telefoneFixo").value,
-      tmvT: document.getElementById("telefoneTrabalho").value
+      telefonePessoal: document.getElementById("telefonePessoal").value,
+      telefoneFixo: document.getElementById("telefoneFixo").value,
+      telefoneTrabalho: document.getElementById("telefoneTrabalho").value
     },
     atualizadoEm: new Date()
   });
+  
   window.location.href = "index.html";
 });
 
