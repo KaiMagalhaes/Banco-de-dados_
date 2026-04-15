@@ -29,7 +29,7 @@ async function guardaFunc(e) {
             id: idDep,    
             nome: nomeDep
         },
-        contacto: {
+        contato: {
             email: document.getElementById("email").value,
             telefonePessoal: document.getElementById("telefonePessoal").value,
             telefoneFixo: document.getElementById("telefoneFixo").value,
