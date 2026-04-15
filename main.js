@@ -37,8 +37,12 @@ function renderItem(id, f) {
 }
 
 async function apagar(id) {
-    if (confirm("Quer excluir?")) {
-        await deleteDoc(doc(bd, "funcion.", id));
+    if (confirm("Quer eliminar?")) {
+        try {
+            await deleteDoc(doc(bd, "funcion.", id));
+        } catch (err) {
+            console.error(err);
+        }
     }
 }
 
@@ -49,25 +53,25 @@ function vincular(snap) {
     });
 }
 
-function carregarLista(termo = "", real = false) {
+function carregarLista(termo = "", real = false, ordem = "desc") {
     if (stop) {
-        console.log("parando tempo real");
         stop();
         stop = null;
     }
 
     let q;
     const ref = collection(bd, "funcion.");
+    const f = termo.trim();
 
-    if (termo) {
-        q = query(ref, where("nome", ">=", termo), where("nome", "<=", termo + "\uf8ff"), orderBy("nome"));
+    if (f) {
+        q = query(ref, where("nome", ">=", f), where("nome", "<=", f + "\uf8ff"), orderBy("nome"));
     } else {
-        q = query(ref, orderBy("nome"));
+        q = query(ref, orderBy("criadoEm", ordem));
     }
 
     const desenhar = (snap) => {
         const elemento = document.getElementById('lista-funcionarios');
-        if (!elemento) return console.error("Lista não encontrada");
+        if (!elemento) return;
         elemento.innerHTML = '';
         snap.forEach((d) => {
             const li = document.createElement('li');
@@ -78,35 +82,39 @@ function carregarLista(termo = "", real = false) {
     };
 
     if (real) {
-        console.log("Modo tempo real ligado");
-        stop = onSnapshot(q, desenhar, (err) => console.error("Erro no TR:", err));
+        stop = onSnapshot(q, desenhar, (err) => console.error(err));
     } else {
-        console.log("Modo tempo real desligado");
-        getDocs(q).then(desenhar).catch(err => console.error("Erro getDocs:", err));
+        getDocs(q).then(desenhar).catch(err => console.error(err));
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    carregarLista();
-    
     const barra = document.getElementById("searchBar");
-    if (barra) {
-        barra.addEventListener("input", (e) => {
-            carregarLista(e.target.value, stop !== null);
-        });
-    }
+    const seletor = document.getElementById("ordenarTempo"); 
+
+    const atualizar = () => {
+        const t = barra ? barra.value : "";
+        const o = seletor && seletor.value === "antigo" ? "asc" : "desc";
+        carregarLista(t, stop !== null, o);
+    };
+
+    carregarLista();
+
+    if (barra) barra.addEventListener("input", atualizar);
+    if (seletor) seletor.addEventListener("change", atualizar);
 
     const btn = document.getElementById("btn-tempo-real");
     if (btn) {
         btn.onclick = () => {
-            const txt = barra ? barra.value : "";
             if (stop) {
-                carregarLista(txt, false);
+                atualizar(); 
                 btn.textContent = "Ativar tempo real";
             } else {
-                carregarLista(txt, true);
+                const t = barra ? barra.value : "";
+                const o = seletor && seletor.value === "antigo" ? "asc" : "desc";
+                carregarLista(t, true, o);
                 btn.textContent = "Parar tempo real";
             }
         };
-    } 
+    }
 });

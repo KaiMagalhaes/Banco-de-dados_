@@ -16,7 +16,6 @@ const bd = getFirestore(app);
 async function guardaFunc(e) {
     e.preventDefault();
 
-   
     const selectDep = document.getElementById("departamento");
     const idDep = selectDep.value;
     const nomeDep = selectDep.options[selectDep.selectedIndex].text;
@@ -40,12 +39,18 @@ async function guardaFunc(e) {
     };
 
     try {
-        await addDoc(collection(bd, "funcion."), novoFunc);
+        // CORREÇÃO: Aqui estava 'novoFunc', mudei para 'novoF' para coincidir com a tua constante
+        await addDoc(collection(bd, "funcion."), novoF); 
         alert("Funcionário registrado");
         window.location.href = "index.html";
     } catch (err) {
-        console.error(err);
+        console.error("Erro ao guardar:", err);
     }
 }
 
-document.getElementById("formFuncionario").addEventListener("submit", guardaFunc);
+const form = document.getElementById("formFuncionario");
+if (form) {
+    form.addEventListener("submit", guardaFunc);
+} else {
+    console.error("Formulário formFuncionario não encontrado");
+}
