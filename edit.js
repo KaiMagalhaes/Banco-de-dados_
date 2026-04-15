@@ -19,7 +19,7 @@ const idFunc = urlPrm.get("id");
 async function carregar() {
   if (!idFunc) return;
   try {
-    const ref = doc(bd, "funcion.", idFunc);
+    const ref = doc(bd, "funcionarios", idFunc);
     const snap = await getDoc(ref);
     if (snap.exists()) {
       const f = snap.data();
@@ -33,9 +33,9 @@ async function carregar() {
 
       const c = f.contacto || {};
       document.getElementById("email").value = c.email || "";
-      document.getElementById("telefonePessoal").value = c.telefonePessoal || "";
-      document.getElementById("telefoneFixo").value = c.telefoneFixo || "";
-      document.getElementById("telefoneTrabalho").value = c.telefoneTrabalho || "";
+      document.getElementById("telefonePessoal").value = c.tmvP || "";
+      document.getElementById("telefoneFixo").value = c.tlfF || "";
+      document.getElementById("telefoneTrabalho").value = c.tmvT || "";
     }
   } catch (err) {
     console.error(err);
@@ -45,7 +45,7 @@ async function carregar() {
 document.getElementById("formFuncionario")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const sel = document.getElementById("departamento");
-  const ref = doc(bd, "funcion.", idFunc);
+  const ref = doc(bd, "funcionarios", idFunc);
   
   await updateDoc(ref, {
     nome: document.getElementById("nome").value,
@@ -57,9 +57,9 @@ document.getElementById("formFuncionario")?.addEventListener("submit", async (e)
     },
     contacto: {
       email: document.getElementById("email").value,
-      telefonePessoal: document.getElementById("telefonePessoal").value,
-      telefoneFixo: document.getElementById("telefoneFixo").value,
-      telefoneTrabalho: document.getElementById("telefoneTrabalho").value
+      tmvP: document.getElementById("telefonePessoal").value,
+      tlfF: document.getElementById("telefoneFixo").value,
+      tmvT: document.getElementById("telefoneTrabalho").value
     },
     atualizadoEm: new Date()
   });
