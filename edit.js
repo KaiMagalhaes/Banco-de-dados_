@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const conf = {
   apiKey: "AIzaSyByK7sas0s_vJRVsogSKkzimOYH-oKEAhE",
@@ -59,13 +59,13 @@ document.getElementById("formFuncionario").addEventListener("submit", async (e) 
       id: selectDep.value,
       nome: selectDep.options[selectDep.selectedIndex].text
     },
-    contacto: {
+    contato: {
       email: document.getElementById("email").value,
       telefonePessoal: document.getElementById("telefonePessoal").value,
       telefoneFixo: document.getElementById("telefoneFixo").value,
       telefoneTrabalho: document.getElementById("telefoneTrabalho").value
     },
-    atualizadoEm: new Date()
+    atualizadoEm: serverTimestamp()
   });
   
   window.location.href = "index.html";
